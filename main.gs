@@ -1,5 +1,5 @@
 function getSuggestRU(term) {
-  var url = 'http://appfollow.io/aso/suggest';
+  var url = 'http://api.appfollow.io/aso/suggest';
   
   var data = {
       'term' : term,
@@ -26,7 +26,7 @@ function getSuggestRU(term) {
 }
 
 function getSuggestUS(term) {
-  var url = 'http://appfollow.io/aso/suggest';
+  var url = 'http://api.appfollow.io/aso/suggest';
   
   var data = {
       'term' : term,
@@ -53,7 +53,7 @@ function getSuggestUS(term) {
 }
 
 function getSearchRU(term) {
-  var url = 'http://appfollow.io/aso/search';
+  var url = 'http://api.appfollow.io/aso/search';
   
   var data = {
       'term' : term,
@@ -81,7 +81,7 @@ function getSearchRU(term) {
 }
 
 function getSearchUS(term) {
-  var url = 'http://appfollow.io/aso/search';
+  var url = 'http://api.appfollow.io/aso/search';
   
   var data = {
       'term' : term,
