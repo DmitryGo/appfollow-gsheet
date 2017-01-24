@@ -107,3 +107,29 @@ function getSearchUS(term) {
   
   return array;
 }
+
+function getTrending(country) {
+  var url = 'http://api.appfollow.io/aso/trending';
+  
+  var data = {
+      'country' : country,
+      'device' : 'iphone'
+  };
+  
+  var res = UrlFetchApp.fetch(url, {
+    'method': 'post',
+    'payload': data
+  });
+  
+  var text = res.getContentText();
+  var trending = text ? JSON.parse(text) : [];
+  
+  var array = [[data.country + ' ' + data.device]];
+  for (var i in trending.trendings) {
+    var item = trending.trendings[i];
+    
+    array.push([item.term]);
+  }
+  
+  return array;
+}
