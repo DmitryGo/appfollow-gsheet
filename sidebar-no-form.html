@@ -1,0 +1,168 @@
+<style>
+        * {
+          font-family: 'Arial', 'sans-serif';
+        }
+        
+        #old-date-input,
+		#new-date-input {
+			margin-bottom: 10px;
+			padding: 8px;
+			border-radius: 3px;
+			box-shadow: none !important;
+			width: 250px;
+            border-color: #eeeeee;
+
+			font-size: 14px;
+		}
+
+		.buttons {
+			margin: 15px 0;
+            text-align: center;
+		}
+
+		.button {
+			display: inline-block;
+			text-align: center;
+			line-height: 29px;
+			border-radius: 3px;
+			font-size: 14px;
+			background: grey;
+			text-decoration: none;
+			font-weight: lighter;
+			width: 72px;
+			height: 29px;
+            cursor: pointer;
+		}
+
+		.submit-button {
+			background: #4880f7;
+			border: 1px solid #346cf1;
+			color: #fff;
+		}
+		.submit-button:hover {
+			background: #346cf1;
+		}
+        
+        #message {
+        	text-align: center;
+            margin: 15px 0 30px 0;
+        }
+        
+        #date-saved-message,
+        #date-error-message {
+            text-align: center;
+            margin: 0;
+            display: none;
+        }
+        
+        #date-error-message {
+            color: red;
+        }
+
+        .hint {
+            padding-top: 15px;
+        }
+        
+        .hint ul {
+        	padding: 15px;
+        }
+
+        .hint ul ul {
+        	padding: 0 15px;
+        }
+
+        .hint > ul > li {
+        	color: #e82723;
+        	background: #f9f9f9;
+        	border: 1px solid #e1e1e8;
+        	border-radius: 2px;
+        	display: inline-block;
+        	padding: 3px 5px;
+        	list-style-type: none;
+        	margin: 2px 0;
+        }
+
+        .hint ul ul li {
+        	list-style-type: none;
+        	padding-left: 20px;
+        }
+</style>
+
+<div style="text-align: center; background: #1c2127; padding-top: 15px;">
+	<img src="https://appfollow.io/assets/2/img/email/logo.png" alt="AppFollow" />
+<div>
+
+<div style="text-align: left; background: #ffffff;">
+	<h1 style="font-size: 20px; text-align: center; padding: 15px 0;">Welcome to AppFollow for Sheets</h1>
+    
+    <p id="message">Connected!</p>
+    
+    <form id="api-form">
+        <p>Keywords Compare</p>
+        <label for="old-date">Old date</label>
+		<input id="old-date-input" type="date" name="old-date" placeholder="Old date" required />
+        <label for="new-date">New date</label>
+		<input id="new-date-input" type="date" name="new-date" placeholder="New date" required />
+
+        <p id="date-saved-message">The date range is saved.</p>        
+        <p id="date-error-message">Please enter a valid date range.</p>
+		
+		<div class="buttons">
+			<a class="button submit-button" onclick="sendDate();">Submit</a>
+		</div>
+        
+	</form>
+    
+    <div class="hint" style="background: #FFEE99;">
+      <p style="text-align: center;"><b>AppFollow Add-On Functions:</b></p>
+    
+      <ul>
+      	1. <i>getSuggest(term, country, device)</i><br>Find suggestions for App Store and Google Play.<br><li>=getSuggest("mario", "US", "android")</li>
+  		<br><br>2. <i>getSearch(term, country, device)</i><br>Search result positions for App Store and Google Play.<br><li>=getSearch("supermario", "GB", "ipad")</li>
+        <br><br>3. <i>getTrending(country, device)</i><br>Trending searches for App Store.<br><li>=getTrending("RU")</li>
+        <br><br>4. <i>getKeywords(ext_id, country, device, date)</i><br>Trending searches for App Store.<br><li>=getKeywords(<br>"com.nintendo.zara", "US", "android")</li>
+        <br><br>5. <i>getKeywordsCompare(ext_id, country, device)</i><br>Trending searches for App Store.<br><li>=getKeywordsCompare(<br>"com.nintendo.zara", "US", "android")</li>
+        <br><br>6. <i>getReviews(ext_id, page, date)</i><br>Trending searches for App Store.<br><li>=getReviews(<br>"com.nintendo.zara")</li>
+        <br><br>7. <i>getReviewsSummary(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getReviewsSummary(<br>"com.nintendo.zara", "2015-07-24")</li>
+        <br><br>8. <i>getRatings(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getRatings("com.nintendo.zara")</li>
+        <br><br>9. <i>getRatingsSummary(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getRatingsSummary(<br>"com.nintendo.zara", "2017-04-24")</li>
+        <br><br>10. <i>getRankings(ext_id, page, date)</i><br>Trending searches for App Store.<br><li>=getRankings(<br>"com.nintendo.zara", "1", "2017-04-24")</li>
+        <br><br>11. <i>getSearchAds(app, country, phrase)</i><br>Trending searches for App Store.<br><li>=getSearchAds("telegram", "US")</li>
+
+        <br><br>Default country is <li>US</li>, default device is <li>iphone</li>.
+      </ul>
+    </div>
+    <p style="text-align: center; background: #fff;">AppFollow for Sheets v2.0</p>
+</div>
+<script>
+    (function() {
+        var oldDate = document.getElementById('old-date-input');
+		var newDate = document.getElementById('new-date-input');
+        
+		oldDate.onchange = function() { hideErrorMessage() };
+		newDate.onchange = function() { hideErrorMessage() };
+	})();
+    
+    function sendDate() {
+      var oldDate = document.getElementById('old-date-input').value;
+      var newDate = document.getElementById('new-date-input').value;
+      
+      if (oldDate === "" || newDate === "" || oldDate > newDate) {
+        document.getElementById('date-saved-message').style.display = "none";
+        showErrorMessage();
+        return;
+      }
+      
+      document.getElementById('date-saved-message').style.display = "block";
+      google.script.run.setOldDate(oldDate);
+      google.script.run.setNewDate(newDate);
+    }
+    
+    function showErrorMessage() {
+      document.getElementById('date-error-message').style.display = "block";
+    }
+    
+    function hideErrorMessage() {
+      document.getElementById('date-error-message').style.display = "none";
+    }
+</script>
