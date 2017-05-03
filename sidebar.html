@@ -1,0 +1,165 @@
+<style>
+        * {
+          font-family: 'Arial', 'sans-serif';
+        }
+		#cid-input,
+		#api-input {
+			margin-bottom: 10px;
+			padding: 8px;
+			border-radius: 3px;
+			box-shadow: none !important;
+			width: 250px;
+            border-color: #eeeeee;
+
+			font-size: 14px;
+		}
+
+		.buttons {
+			margin: 15px 0;
+            text-align: center;
+		}
+
+		.button {
+			display: inline-block;
+			text-align: center;
+			line-height: 29px;
+			border-radius: 3px;
+			font-size: 14px;
+			background: grey;
+			text-decoration: none;
+			font-weight: lighter;
+			width: 72px;
+			height: 29px;
+            cursor: pointer;
+		}
+
+		.submit-button {
+			background: #4880f7;
+			border: 1px solid #346cf1;
+			color: #fff;
+		}
+		.submit-button:hover {
+			background: #346cf1;
+		}
+        
+        #validation-message {
+            color: #FF0000;
+            margin-top: 0;
+            display: none;
+        }
+        
+        #message {
+        	text-align: center;
+        	display: none;
+            margin: 15px 0 30px 0;
+        }
+        
+        .hint {
+            padding-top: 15px;
+        }
+
+        .hint ul {
+        	padding: 15px;
+        }
+
+        .hint ul ul {
+        	padding: 0 15px;
+        }
+
+        .hint > ul > li {
+        	color: #e82723;
+        	background: #f9f9f9;
+        	border: 1px solid #e1e1e8;
+        	border-radius: 2px;
+        	display: inline-block;
+        	padding: 3px 5px;
+        	list-style-type: none;
+        	margin: 2px 0;
+        }
+
+        .hint ul ul li {
+        	list-style-type: none;
+        	padding-left: 20px;
+        }
+</style>
+
+<div style="text-align: center; background: #1c2127; padding-top: 15px;">
+	<img src="https://appfollow.io/assets/2/img/email/logo.png" alt="AppFollow" />
+<div>
+<div style="text-align: left; background: #ffffff;">
+	<h1 style="font-size: 20px; text-align: center; padding: 15px 0;">Welcome to AppFollow for Sheets</h1>
+	
+	<form id="api-form">
+        <label for="cid">Enter your <a href="http://appfollow.help/getting-started/api-description-methods-examples">API access</a></label>
+		<input id="cid-input" type="text" name="cid" placeholder="cid" required />
+		<input id="api-input" type="text" name="api-secret" placeholder="api-secret" required />
+        
+        <p id="validation-message">Please enter valid API cid and secret.</p>
+		
+		<div class="buttons">
+			<a class="button submit-button" onclick="validate()">Submit</a>
+		</div>
+        
+        <p style="text-align: center;">No account? <a href="http://appfollow.io/+gsheet">Sign up for free</a></p>
+	</form>
+    
+    <div class="hint" style="background: #FFEE99;">
+      <p style="text-align: center;"><b>AppFollow Add-On Functions:</b></p>
+    
+      <ul>
+      	1. <i>getSuggest(term, country, device)</i><br>Find suggestions for App Store and Google Play.<br><li>=getSuggest("mario", "US", "android")</li>
+  		<br><br>2. <i>getSearch(term, country, device)</i><br>Search result positions for App Store and Google Play.<br><li>=getSearch("supermario", "GB", "ipad")</li>
+        <br><br>3. <i>getTrending(country, device)</i><br>Trending searches for App Store.<br><li>=getTrending("RU")</li>
+        <br><br>4. <i>getKeywords(ext_id, country, device, date)</i><br>Trending searches for App Store.<br><li>=getKeywords(<br>"com.nintendo.zara", "US", "android")</li>
+        <br><br>5. <i>getKeywordsCompare(ext_id, country, device)</i><br>Trending searches for App Store.<br><li>=getKeywordsCompare(<br>"com.nintendo.zara", "US", "android")</li>
+        <br><br>6. <i>getReviews(ext_id, page, date)</i><br>Trending searches for App Store.<br><li>=getReviews(<br>"com.nintendo.zara")</li>
+        <br><br>7. <i>getReviewsSummary(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getReviewsSummary(<br>"com.nintendo.zara", "2015-07-24")</li>
+        <br><br>8. <i>getRatings(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getRatings("com.nintendo.zara")</li>
+        <br><br>9. <i>getRatingsSummary(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getRatingsSummary(<br>"com.nintendo.zara", "2017-04-24")</li>
+        <br><br>10. <i>getRankings(ext_id, page, date)</i><br>Trending searches for App Store.<br><li>=getRankings(<br>"com.nintendo.zara", "1", "2017-04-24")</li>
+        <br><br>11. <i>getSearchAds(app, country, phrase)</i><br>Trending searches for App Store.<br><li>=getSearchAds("telegram", "US")</li>
+
+        <br><br>Default country is <li>US</li>, default device is <li>iphone</li>.
+      </ul>
+    </div>
+    
+    <p style="text-align: center; background: #fff;">AppFollow for Sheets v2.0</p>
+</div>
+
+<script>
+    (function() {
+        var cid = document.getElementById('cid-input');
+		var apiSecret = document.getElementById('api-input');
+        
+		cid.onchange = function() { resetError(cid) };
+		apiSecret.onchange = function() { resetError(apiSecret) };
+	})();
+
+	function resetError(element) {
+		element.style.borderColor = "#eeeeee";
+	}
+
+	function validate() {
+		var cid = document.getElementById('cid-input');
+		var apiSecret = document.getElementById('api-input');
+
+		if (cid.value == '' || apiSecret.value == '') {
+			if (cid.value == '' && apiSecret.value == '') {
+				cid.style.borderColor = "red";
+				apiSecret.style.borderColor = "red";
+			} else if (apiSecret.value == '') {
+				apiSecret.style.borderColor = "red";
+			} else {
+				cid.style.borderColor = "red";
+			}
+            document.getElementById("validation-message").style.display = "block";
+		} else {
+			sendData(cid, apiSecret);
+            document.getElementById('validation-message').style.display = "none";
+		}
+	}
+
+	function sendData(cid, apiSecret) {
+		google.script.run.setUserData(cid.value, apiSecret.value);
+	}
+</script>
