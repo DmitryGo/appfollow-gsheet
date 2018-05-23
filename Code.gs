@@ -21,11 +21,11 @@ function onOpen() {
 		.addItem('Remove data', '_removeData')
 		.addToUi();
 
-	refreshLastUpdate();
+	//refreshLastUpdate();
 }
 
 function onEdit(e) {
-	refreshLastUpdate();
+	//refreshLastUpdate();
 }
 
 function showSidebar() {
@@ -727,7 +727,7 @@ function getSearchAds(app, country, phrase) {
 	if ('error' in searchAds) {
 		var limitString = 'limit exceeded';
 		var errorMsg;
-		if (searchAds.error.msg.indexOf(limitString) !== -1) {
+		if (searchAds.error.msg && searchAds.error.msg.indexOf(limitString) !== -1) {
 			var errorMsg = cid == DEMO_CID ? DEMO_LIMIT_MSG : '[cid ' + cid + '] Please upgrade your account in AppFollow.';
 			return [[errorMsg]];
 		}
@@ -1264,7 +1264,7 @@ function _getFormula(params) {
 	return formula;
 }
 
-function _showReport(params, funcLabel, isNewSheet) {
+function _showReport(params, funcLabel, isNewSheet, isAutoRefresh) {
 	var ss = SpreadsheetApp.getActiveSpreadsheet();
 	var sheets = ss.getSheets();
 
@@ -1292,7 +1292,10 @@ function _showReport(params, funcLabel, isNewSheet) {
 	}
 
 	deleteTrigger();
-	createSpreadsheetOpenTrigger();
+
+	if (isAutoRefresh) {
+		createSpreadsheetOpenTrigger();
+	}
 }
 
 function _getLocalTime() {

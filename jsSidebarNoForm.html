@@ -144,13 +144,14 @@
 		usedParams = usedParams.slice(2);
 		var funcLabel = document.getElementById('select-function').selectedOptions[0].label;
 		var isNewSheet = document.getElementById('checkbox').checked;
-
+		var isAutoRefresh = document.getElementById('checkbox-refresh').checked;
 		var params = [func];
+
 		for (var i = 0; i < usedParams.length; i++) {
 			params.push(usedParams[i].value);
 		}
 
-		google.script.run._showReport(params, funcLabel, isNewSheet);
+		google.script.run._showReport(params, funcLabel, isNewSheet, isAutoRefresh);
 	}
 
 	function generateFilters() {
