@@ -1,0 +1,158 @@
+<style>
+	* {
+		font-family: 'Arial', 'sans-serif';
+	}
+	body {
+		margin: 0;
+	}
+	.container {
+		background-color: #1e94e8;
+		background: url('https://appfollow.io/assets/2/img/addon/addon_bg_login.png') 100% 100% no-repeat;
+		background-size: cover;
+		min-height: 100vh;
+		z-index: 1;
+		padding-top: 150px;
+		box-sizing: border-box;
+	}
+	.container__header {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 44px;
+		background: #fff;
+		box-shadow: 0 1px 2px 0 rgba(0,0,0,0.25);
+	}
+	.container__logo {
+		font-size: 25px;
+		font-weight: 700;
+		display: block;
+		width: 162px;
+		height: 26px;
+		margin: 9px auto;
+		text-transform: uppercase;
+		text-align: center;
+		text-decoration: none !important;
+		color: #4A4A4A !important;
+	}
+	.container__demo {
+		color: #fff;
+		font-size: 14px;
+		font-weight: 500;
+		width: 186px;
+		margin: 10px auto 0;
+		text-align: center;
+	}
+	.container__demo-link {
+		top: 465px;
+	}
+	.container a {
+		color: #fff;
+		text-decoration: underline;
+	}
+	.container__hint,
+	.container__version {
+		color: #fff;
+		font-size: 13px;
+		margin: 0;
+		text-align: center;
+		width: 100%;
+		position: absolute;
+	}
+	#login .container__hint {
+		bottom: 20px;
+	}
+	#login .container__version {
+		bottom: 5px;
+	}
+	.greeting {
+		font-size: 16px;
+		color: #fff;
+		font-weight: 400;
+		max-width: 200px;
+		margin: 0;
+		text-align: center;
+		z-index: 2;
+		position: absolute;
+		top: 54px;
+		left: 50px
+	}
+	.container__block {
+		width: 280px;
+		margin: auto;
+		padding: 0 0 50px;
+		position: relative;
+	}
+	.form {
+		width: 280px;
+		height: auto;
+		background: #fff;
+		padding: 15px;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+		border-radius: 4px;
+		box-sizing: border-box;
+		overflow: hidden;
+		position: relative;
+	}
+	.form a {
+		color: #3898e5;
+		text-decoration: none;
+	}
+	.form__header {
+		font-size: 16px;
+		text-align: left;
+		color: #4a4a4a;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #e1e7ea;
+		margin: 0;
+		margin-bottom: 15px;
+		box-sizing: border-box;
+	}
+	.form__input {
+		display: block;
+		width: 100%;
+		margin-bottom: 10px;
+		padding: 10px;
+		height: 36px;
+		border: 1px solid #c8c8c2;
+		box-shadow: inset 0 1px 3px 0 rgba(149, 149, 149, 0.5);
+		border-radius: 4px;
+		font-size: 12px;
+		color: #868682;
+		box-sizing: border-box;
+	}
+	.form__input:focus {
+		border: 2px solid #1e94e8;
+		padding-left: 9px;
+		color: #474645;
+	}
+	.form__button {
+		display: block;
+		height: 36px;
+		line-height: 36px;
+		text-align: center;
+		width: 250px;
+		margin: 20px auto 0;
+		border-radius: 4px;
+		cursor: pointer;
+		background: #dd2c00;
+		border: 1px solid #a40014;
+		color: #ffffff;
+		font-size: 14px;
+		box-sizing: border-box;
+		transition: background .35s ease;
+	}
+	.form__button:hover {
+		background: #c12600;
+	}
+	.form__button:active {
+		background: #a40014;
+	}
+	#validation-message {
+		color: #dd2c00;
+		font-size: 12px;
+		text-align: left;
+		margin: 0;
+		display: none;
+	}
+</style>

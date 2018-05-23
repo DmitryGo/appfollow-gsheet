@@ -1,0 +1,50 @@
+<script>
+	(function() {
+		var cid = document.getElementById('input-cid');
+		var apiSecret = document.getElementById('input-api');
+
+		cid.onchange = function() {
+			resetError(cid);
+		};
+		apiSecret.onchange = function() {
+			resetError(apiSecret);
+		};
+	})();
+
+	function resetError(element) {
+		element.style.borderColor = '#c8c8c2';
+	}
+
+	function validate() {
+		var cid = document.getElementById('input-cid');
+		var apiSecret = document.getElementById('input-api');
+
+		if (cid.value == '' || apiSecret.value == '') {
+			if (cid.value == '' && apiSecret.value == '') {
+				cid.style.borderColor = '#dd2c00';
+				apiSecret.style.borderColor = '#dd2c00';
+			} else if (apiSecret.value == '') {
+				apiSecret.style.borderColor = '#dd2c00';
+			} else {
+				cid.style.borderColor = '#dd2c00';
+			}
+			document.getElementById('validation-message').style.display = 'block';
+			document.querySelector('.form__header').style.marginBottom = '0';
+		} else {
+			sendData(cid, apiSecret);
+			document.getElementById('validation-message').style.display = 'none';
+			document.querySelector('.form__header').style.marginBottom = '15px';
+		}
+	}
+
+	function sendData(cid, apiSecret) {
+		google.script.run.showSpinner();
+		google.script.run.setUserData(cid.value, apiSecret.value);
+	}
+
+	function setDemoAccount(e) {
+		e.preventDefault();
+		google.script.run.showSpinner();
+		google.script.run._setDemoAccount(true);
+	}
+</script>
