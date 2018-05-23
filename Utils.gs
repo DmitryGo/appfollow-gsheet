@@ -2,11 +2,11 @@ function makeRequest(params, endpoint, api_secret) {
 	var params2 = new Object;
 
 	for (var attr in params) {
-		params2[attr] = params[attr];
-	};
+		params2[attr] = params[attr]
+	}
 
 	var sign = makeSign(params2, endpoint, api_secret);
-	params2['sign'] = sign;
+	params2["sign"] = sign;
 
 	var url = BASE_URL + endpoint + paramsToQuery(params2);
 	var response = UrlFetchApp.fetch(url);
@@ -16,12 +16,11 @@ function makeRequest(params, endpoint, api_secret) {
 
 function makeSign(params, endpoint, apiSecret) {
 	params = sortObject(params);
-
-	var signString = '';
+	var signString = "";
 
 	for (var attr in params) {
-		signString += attr + '=' + params[attr];
-	};
+		signString += attr + "=" + params[attr]
+	}
 
 	signString += endpoint + apiSecret;
 	var signed = sign(signString);
@@ -30,44 +29,38 @@ function makeSign(params, endpoint, apiSecret) {
 }
 
 function sign(message){
-	message = message || 'thisisteststring';
-
+	message = message || "thisisteststring";
 	Logger.log(message);
 
 	var signature = Utilities.computeDigest(
 		Utilities.DigestAlgorithm.MD5,
 		message,
-		Utilities.Charset.UTF_8,
-	);
+		Utilities.Charset.UTF_8);
 
 	var signatureStr = '';
 
 	for (i = 0; i < signature.length; i++) {
 		var byte = signature[i];
 
-		if (byte < 0) {
+		if (byte < 0)
 			byte += 256;
-		}
 
 		var byteStr = byte.toString(16);
 
 		// Ensure we have 2 chars in our byte, pad with 0
-
-		if (byteStr.length === 1) {
+		if (byteStr.length == 1)
 			byteStr = '0'+byteStr;
-		}
 
 		signatureStr += byteStr;
 	}
-
 	Logger.log(signatureStr);
 
 	return signatureStr;
 }
 
 function sortObject(o) {
-	var sorted = {};
-	var key, a = [];
+	var sorted = {},
+	key, a = [];
 
 	for (key in o) {
 		if (o.hasOwnProperty(key)) {
@@ -87,6 +80,7 @@ function sortObject(o) {
 function paramsToQuery(json) {
 	return '?' +
 		Object.keys(json).map(function(key) {
-			return encodeURIComponent(key) + '=' + encodeURIComponent(json[key]);
+			return encodeURIComponent(key) + '=' +
+				encodeURIComponent(json[key]);
 		}).join('&');
 }
