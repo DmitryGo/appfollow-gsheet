@@ -1,168 +1,244 @@
-<style>
-        * {
-          font-family: 'Arial', 'sans-serif';
-        }
-        
-        #old-date-input,
-		#new-date-input {
-			margin-bottom: 10px;
-			padding: 8px;
-			border-radius: 3px;
-			box-shadow: none !important;
-			width: 250px;
-            border-color: #eeeeee;
+<?!= include('cssSidebarNoForm') ?>
 
-			font-size: 14px;
-		}
+<div class="container">
+	<div class="container__header">
+		<a href="https://appfollow.io" class="container__logo" target="_blank">AppFollow</a>
+		<a href="#" class="menu-icon menu-closed" onclick="toggleMenu(event);"><span></span></a>
+	</div>
+	<? if (isDemoAccount) { ?>
+	<h1 class="greeting"><span><b>Demo</b> mode, <a href onclick="logout();">sign in</a></span></h1>
+	<? } else { ?>
+	<h1 class="greeting"><span><b>cid:</b> <?= cid ?></span></h1>
+	<? } ?>
 
-		.buttons {
-			margin: 15px 0;
-            text-align: center;
-		}
+	<div class="container__block">
+		<div id="form-auto">
+			<form class="form" onsubmit="validateFilters(event);">
+				<h1 class="form__header">Functions</h1>
 
-		.button {
-			display: inline-block;
-			text-align: center;
-			line-height: 29px;
-			border-radius: 3px;
-			font-size: 14px;
-			background: grey;
-			text-decoration: none;
-			font-weight: lighter;
-			width: 72px;
-			height: 29px;
-            cursor: pointer;
-		}
+				<select id="select-function" onchange="generateFilters(this);">
+					<option value disabled>-------------------------------------</option>
+					<option value disabled>ASO Tools</option>
+					<option value disabled>-------------------------------------</option>
+					<option value="getSuggest" selected="selected">Suggest</option>
+					<option value="getSearch">Search</option>
+					<option value="getTrending">Trending Search</option>
+					<option value="getSearchAds">Search Ads Quality Score</option>
 
-		.submit-button {
-			background: #4880f7;
-			border: 1px solid #346cf1;
-			color: #fff;
-		}
-		.submit-button:hover {
-			background: #346cf1;
-		}
-        
-        #message {
-        	text-align: center;
-            margin: 15px 0 30px 0;
-        }
-        
-        #date-saved-message,
-        #date-error-message {
-            text-align: center;
-            margin: 0;
-            display: none;
-        }
-        
-        #date-error-message {
-            color: red;
-        }
+					<option value disabled>-------------------------------------</option>
+					<option value disabled>Reports from the account</option>
+					<option value disabled>-------------------------------------</option>
+					<option value="getReviews">Reviews</option>
+					<option value="getReviewsSummary">Reviews Summary</option>
+					<option value="getRatings">Ratings</option>
+					<option value="getRatingsSummary">Ratings Summary</option>
 
-        .hint {
-            padding-top: 15px;
-        }
-        
-        .hint ul {
-        	padding: 15px;
-        }
+					<option value="getKeywords">Keywords</option>
+					<option value="getKeywordsCompare">Keywords Compare</option>
+					<option value="saveKeywords">Keywords Add</option>
+					<option value="_getASOReport">ASO Report</option>
 
-        .hint ul ul {
-        	padding: 0 15px;
-        }
+					<option value="getRankings">Rankings</option>
+					<option value="getWhatsNew">What's New</option>
+					<option value="getCollections">App Collections</option>
+					<option value="getAppsFromCollection">Apps</option>
+				</select>
 
-        .hint > ul > li {
-        	color: #e82723;
-        	background: #f9f9f9;
-        	border: 1px solid #e1e1e8;
-        	border-radius: 2px;
-        	display: inline-block;
-        	padding: 3px 5px;
-        	list-style-type: none;
-        	margin: 2px 0;
-        }
+				<p id="validation-ext" class="validation-message">Enter App ID (ext_id)</p>
+				<input style="display: none;" name="ext" class="form__input" type="text" id="input-ext" placeholder="Enter App ID (ext_id)">
 
-        .hint ul ul li {
-        	list-style-type: none;
-        	padding-left: 20px;
-        }
-</style>
+				<p id="validation-term" class="validation-message">Enter term / keyword</p>
+				<input class="form__input" name="term" type="text" id="input-term" placeholder="Enter Keyword or search term">
 
-<div style="text-align: center; background: #1c2127; padding-top: 15px;">
-	<img src="https://appfollow.io/assets/2/img/email/logo.png" alt="AppFollow" />
-<div>
+				<p id="validation-app" class="validation-message">Enter app name</p>
+				<input style="display: none;" class="form__input" name="app" type="text" id="input-app" placeholder="Enter app name">
 
-<div style="text-align: left; background: #ffffff;">
-	<h1 style="font-size: 20px; text-align: center; padding: 15px 0;">Welcome to AppFollow for Sheets</h1>
-    
-    <p id="message">Connected!</p>
-    
-    <form id="api-form">
-        <p>Keywords Compare</p>
-        <label for="old-date">Old date</label>
-		<input id="old-date-input" type="date" name="old-date" placeholder="Old date" required />
-        <label for="new-date">New date</label>
-		<input id="new-date-input" type="date" name="new-date" placeholder="New date" required />
+				<input style="display: none;" name="page" class="form__input" type="text" id="input-page" placeholder="Enter the page number">
 
-        <p id="date-saved-message">The date range is saved.</p>        
-        <p id="date-error-message">Please enter a valid date range.</p>
-		
-		<div class="buttons">
-			<a class="button submit-button" onclick="sendDate();">Submit</a>
+				<select id="select-country-all">
+					<? for (var i = 0; i < countriesAll.length; i++) { ?>
+					<option value="<?= countriesAll[i].value ?>" <?= ('disabled' in countriesAll[i]) ? "disabled" : "" ?> ><?= countriesAll[i].text ?></option>
+					<? } ?>
+				</select>
+
+				<select style="display: none;" id="select-country-ww">
+					<? for (var i = 0; i < countriesWW.length; i++) { ?>
+					<option value="<?= countriesWW[i].value ?>" <?= ('disabled' in countriesWW[i]) ? "disabled" : "" ?> ><?= countriesWW[i].text ?></option>
+					<? } ?>
+				</select>
+
+				<select style="display: none;" id="select-country-sads">
+					<? for (var i = 0; i < countriesSAds.length; i++) { ?>
+					<option value="<?= countriesSAds[i].value ?>" <?= ('disabled' in countriesSAds[i]) ? "disabled" : "" ?> ><?= countriesSAds[i].text ?></option>
+					<? } ?>
+				</select>
+
+				<select id="select-device">
+					<option value="iphone" selected="selected">iPhone</option>
+					<option value="ipad">iPad</option>
+					<option value="android">Android</option>
+				</select>
+
+				<select style="display: none;" id="select-store" onchange="toggleChannel();">
+					<option value="iphone">App Store</option>
+					<option value="android">Google Play</option>
+				</select>
+
+				<select style="display: none;" id="select-device-trending">
+					<option value="iphone" selected="selected">iPhone</option>
+					<option value="ipad">iPad</option>
+				</select>
+
+
+				<p id="validation-kws" class="validation-message">Enter keywords</p>
+				<input style="display: none;" class="form__input" type="text" id="input-phrase" placeholder="Enter keywords">
+
+				<p id="validation-apps-id" class="validation-message">Enter Collection ID</p>
+				<input style="display: none;" type="text" id="input-apps" class="form__input" placeholder="Enter Collection ID">
+
+				<p id="aso-hint" style="display: none;">The interval should be less than 7 days.</p>
+
+				<p id="validation-date" class="validation-message">Enter date</p>
+				<input style="display: none;" type="date" placeholder="From: YYYY-MM-DD" class="form__input" id="input-date-old">
+
+				<input style="display: none;" type="date" placeholder="To: YYYY-MM-DD" class="form__input" id="input-date-new">
+
+				<select style="display: none;" id="select-channel-ios">
+					<option value="time_series">Summary</option>
+					<option value="channel">Channels</option>
+					<option value="campaign">Campaigns</option>
+					<option value="site">Sites</option>
+				</select>
+
+				<select style="display: none;" id="select-channel-android">
+					<option value="country_summary">Summary</option>
+					<option value="channel">Channels</option>
+					<option value="country_organic_summary">Organic</option>
+				</select>
+
+				<input style="display: none;" class="form__input" type="text" placeholder="Enter country (ios) / lang (android)" id="input-lang" />
+
+				<div id="checkbox-one-page">
+					<input type="checkbox" id="checkbox" checked>
+					<label for="checkbox">Print on the new sheet</label>
+				</div>
+
+				<input id="report-button" type="submit" class="form__button" value="Get report">
+			</form>
+
+			<p class="container__toggle-form" onclick="toggleForm();"><span class="g--underlined">View functions</span><span> ></span></p>
 		</div>
-        
-	</form>
-    
-    <div class="hint" style="background: #FFEE99;">
-      <p style="text-align: center;"><b>AppFollow Add-On Functions:</b></p>
-    
-      <ul>
-      	1. <i>getSuggest(term, country, device)</i><br>Find suggestions for App Store and Google Play.<br><li>=getSuggest("mario", "US", "android")</li>
-  		<br><br>2. <i>getSearch(term, country, device)</i><br>Search result positions for App Store and Google Play.<br><li>=getSearch("supermario", "GB", "ipad")</li>
-        <br><br>3. <i>getTrending(country, device)</i><br>Trending searches for App Store.<br><li>=getTrending("RU")</li>
-        <br><br>4. <i>getKeywords(ext_id, country, device, date)</i><br>Trending searches for App Store.<br><li>=getKeywords(<br>"com.nintendo.zara", "US", "android")</li>
-        <br><br>5. <i>getKeywordsCompare(ext_id, country, device)</i><br>Trending searches for App Store.<br><li>=getKeywordsCompare(<br>"com.nintendo.zara", "US", "android")</li>
-        <br><br>6. <i>getReviews(ext_id, page, date)</i><br>Trending searches for App Store.<br><li>=getReviews(<br>"com.nintendo.zara")</li>
-        <br><br>7. <i>getReviewsSummary(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getReviewsSummary(<br>"com.nintendo.zara", "2015-07-24")</li>
-        <br><br>8. <i>getRatings(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getRatings("com.nintendo.zara")</li>
-        <br><br>9. <i>getRatingsSummary(ext_id, date)</i><br>Trending searches for App Store.<br><li>=getRatingsSummary(<br>"com.nintendo.zara", "2017-04-24")</li>
-        <br><br>10. <i>getRankings(ext_id, page, date)</i><br>Trending searches for App Store.<br><li>=getRankings(<br>"com.nintendo.zara", "1", "2017-04-24")</li>
-        <br><br>11. <i>getSearchAds(app, country, phrase)</i><br>Trending searches for App Store.<br><li>=getSearchAds("telegram", "US")</li>
 
-        <br><br>Default country is <li>US</li>, default device is <li>iphone</li>.
-      </ul>
-    </div>
-    <p style="text-align: center; background: #fff;">AppFollow for Sheets v2.0</p>
+		<div id="form-manually" class="form__manually" style="right: -300px">
+			<div class="form">
+				<h1 class="form__header">Functions</h1>
+				<ul class="form__hints">
+					<p class="form__hints-header">
+						1. <span class="form__hints-name">getSuggest(term; country; device)</span>
+						<br>Find suggestions for App Store and Google Play.
+					</p>
+					<li>=getSuggest("mario"; "US"; "android")</li>
+					<p class="form__hints-header">
+						2. <span class="form__hints-name">getSearch(term; country; device)</span>
+						<br>Search result positions for App Store and Google Play.
+					</p>
+					<li>=getSearch("supermario"; "GB"; "ipad")</li>
+					<p class="form__hints-header">
+						3. <span class="form__hints-name">getTrending(country; device)</span>
+						<br>Trending searches for App Store.
+					</p>
+					<li>=getTrending("RU")</li>
+					<p class="form__hints-header">
+						4. <span class="form__hints-name">getSearchAds(app_title; country; phrase)</span>
+						<br>Get keywords and quality score for the app from Search Ads.
+					</p>
+					<li>=getSearchAds("telegram"; "US")</li>
+					<p class="form__hints-header">
+						5. <span class="form__hints-name">getKeywords(ext_id; country; device; date)</span>
+						<br>Get keyword positions for the app.
+					</p>
+					<li>=getKeywords(<br>"692885364"; "US"; "android", "2018-01-01")</li>
+					<p class="form__hints-header">
+						6. <span class="form__hints-name">getKeywordsCompare(ext_id; old_date; new_date; country, device)</span>
+						<br>Compare keyword positions for the app.
+					</p>
+					<li>=getKeywordsCompare(<br />"692885364"; "2017-04-21"; "2017-04-30"; "US"; "android")</li>
+					<p class="form__hints-header">
+						7. <span class="form__hints-name">saveKeywords(country; device; keywords; collection_id)</span>
+						<br>Save keywords in the app collection @ AppFollow.
+					</p>
+					<li>=saveKeywords("RU"; "iphone"; "keywords, separated by a, comma", "apps")</li>
+					<p class="form__hints-header">
+						8. <span class="form__hints-name">getReviews(ext_id; page; date; device; lang/country)</span>
+						<br>Get reviews for the app.
+					</p>
+					<li>=getReviews("692885364";"1";"2018-01-01";"iphone")</li>
+					<p class="form__hints-header">
+						9. <span class="form__hints-name">getReviewsSummary(ext_id; from; to; device; lang/country)</span>
+						<br>Get summary reviews for the app.
+					</p>
+					<li>=getReviewsSummary(<br />"692885364";"2018-01-01";"2018-01-01";"iphone")</li>
+					<p class="form__hints-header">
+						10. <span class="form__hints-name">getRatings(device; ext_id; date)</span>
+						<br>Get ratings history for the app.
+					</p>
+					<li>=getRatings("android"; "com.nintendo.zara")</li>
+					<p class="form__hints-header">
+						11. <span class="form__hints-name">getRatingsSummary(device; ext_id; date)</span>
+						<br>Get summary ratings for the app.
+					</p>
+					<li>=getRatingsSummary("android"; <br />"692885364"; "2017-04-24")</li>
+					<p class="form__hints-header">
+						12. <span class="form__hints-name">getRankings(ext_id; page; date)</span>
+						<br>Get rankings history for the app.
+					</p>
+					<li>=getRankings("692885364"; "1"; "2017-04-24")</li>
+					<p class="form__hints-header">
+						13. <span class="form__hints-name">getWhatsNew(ext_id; page; last_modified; device; lang/country)</span>
+						<br>What's new.
+					</p>
+					<li>=getWhatsNew("com.Slack"; ""; ""; "android"; "ru")</li>
+					<p class="form__hints-header">
+						14. <span class="form__hints-name">getCollections()</span>
+						<br>Get collections list.
+					</p>
+					<li>=getCollections()</li>
+					<p class="form__hints-header">
+						15. <span class="form__hints-name">getAppsFromCollection(<br />collection_id)</span>
+						<br>Get list of apps from the collection.
+					</p>
+					<li>=getAppsFromCollection("7458")</li>
+					<p class="form__hints-header">
+						16. <span class="form__hints-name">getASOReport(ext_id; country; date; channel)</span>
+						<br>Get ASO report for the app.
+					</p>
+					<li>=getASOReport("692885364"; "us"; "2017-11-24"; "campaign")</li>
+				</ul>
+			</div>
+
+			<p class="container__toggle-form" onclick="toggleForm();"><span>< </span><span class="g--underlined">Back</span></p>
+		</div>
+	</div>
+
+	<div id="loader-dimmer" class="hide">
+		<img src="https://appfollow.io/assets/2/img/addon/spinner256.png" alt="Loading..." id="loader" class="hide">
+	</div>
+
+	<p class="container__hint">If you need help, please <a href="mailto:help@appfollow.io">contact us</a>.</p>
+	<p class="container__version">AppFollow for Sheets v2.7.0</p>
+
+	<div class="menu closed">
+		<p class="menu__user-data"><span class="g--bold">cid:</span> <?= cid ?></p>
+		<p class="menu__user-data"><span class="g--bold">api_secret:</span> <?= getSafeApiSecret() ?></p>
+		<div class="menu__settings">
+		</div>
+
+		<? if (isDemoAccount) { ?>
+		<p class="menu__demo">This is the <b>demo</b> account, please use your own account, <a href onclick="logout();">sign in.</a></p>
+		<? } else { ?>
+		<p class="form__button" onclick="logout()">Logout</p>
+		<? } ?>
+	</div>
 </div>
-<script>
-    (function() {
-        var oldDate = document.getElementById('old-date-input');
-		var newDate = document.getElementById('new-date-input');
-        
-		oldDate.onchange = function() { hideErrorMessage() };
-		newDate.onchange = function() { hideErrorMessage() };
-	})();
-    
-    function sendDate() {
-      var oldDate = document.getElementById('old-date-input').value;
-      var newDate = document.getElementById('new-date-input').value;
-      
-      if (oldDate === "" || newDate === "" || oldDate > newDate) {
-        document.getElementById('date-saved-message').style.display = "none";
-        showErrorMessage();
-        return;
-      }
-      
-      document.getElementById('date-saved-message').style.display = "block";
-      google.script.run.setOldDate(oldDate);
-      google.script.run.setNewDate(newDate);
-    }
-    
-    function showErrorMessage() {
-      document.getElementById('date-error-message').style.display = "block";
-    }
-    
-    function hideErrorMessage() {
-      document.getElementById('date-error-message').style.display = "none";
-    }
-</script>
+
+<?!= include('jsSidebarNoForm') ?>

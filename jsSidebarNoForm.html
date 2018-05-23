@@ -1,0 +1,407 @@
+<script>
+	function showSpinner() {
+		var loaderDimmer = document.getElementById('loader-dimmer');
+		var loader = document.getElementById('loader');
+
+		loader.classList.toggle('hide');
+		loaderDimmer.classList.toggle('hide');
+
+		setTimeout(function() {
+			loaderDimmer.classList.toggle('hide');
+			loader.classList.toggle('hide');
+		}, 2500);
+	}
+
+	function toggleChannel() {
+		var storeSelect = document.getElementById('select-store');
+		var func = document.getElementById('select-function').selectedOptions[0].value;
+		var value = storeSelect.selectedOptions[0].value;
+		var selectChannelIos = document.getElementById('select-channel-ios');
+		var selectChannelAndroid = document.getElementById('select-channel-android');
+
+		if (func === '_getASOReport' && (value === 'iphone')) {
+			hide([selectChannelAndroid]);
+			show([selectChannelIos]);
+		} else if (func === '_getASOReport' && (value === 'android')) {
+			hide([selectChannelIos]);
+			show([selectChannelAndroid]);
+		}
+	}
+	function setContainersHeight() {
+		var manual = document.getElementById('form-manually');
+		var auto = document.getElementById('form-auto');
+		var containerBlock = document.querySelector('.container__block');
+
+		if (manual.style.right === '-300px') {
+			containerBlock.style.height =
+				auto.offsetHeight > 409 ? auto.offsetHeight + 'px' : '409px';
+		} else if (auto.style.right === '320px') {
+			containerBlock.style.height =
+				manual.offsetHeight > 409 ? manual.offsetHeight + 'px' : '409px';
+		}
+	}
+	function toggleForm() {
+		var manual = document.getElementById('form-manually');
+		var auto = document.getElementById('form-auto');
+		var manualForm = manual.querySelector('.form');
+		var containerElem = document.querySelector('.container');
+
+		if (manual.style.right === '-300px') {
+			// hide form
+			auto.style.position = 'absolute';
+			auto.style.right = '320px';
+			// show hints
+			manual.style.right = '0';
+			manual.style.position = 'relative';
+			manualForm.style.maxHeight = 'none';
+			containerElem.style.height = 'auto';
+		} else if (auto.style.right === '320px') {
+			// hide hints
+			manual.style.position = 'absolute';
+			manual.style.right = '-300px';
+			manualForm.style.maxHeight = '332px';
+			// show form
+			auto.style.position = 'relative';
+			auto.style.right = '0';
+			containerElem.style.height = 'auto';
+		}
+	}
+	function logout() {
+		google.script.run._removeData();
+	}
+	function validateInput(element, message) {
+		var isValid = true;
+
+		if (element.style.display !== 'none') {
+			if (element.value === '') {
+				show([message]);
+				isValid = false;
+			} else {
+				hide([message]);
+				isValid = true;
+			}
+		} else if (element.style.display === 'none') {
+			hide([message]);
+			isValid = true;
+		}
+
+		return isValid;
+	}
+	function validateFilters(event) {
+		event.preventDefault();
+		var func = document.getElementById('select-function').value;
+		var extInput = document.getElementById('input-ext'),
+			termInput = document.getElementById('input-term'),
+			dateOldInput = document.getElementById('input-date-old'),
+			dateNewInput = document.getElementById('input-date-new'),
+			appInput = document.getElementById('input-app'),
+			kwsInput = document.getElementById('input-phrase'),
+			appsInput = document.getElementById('input-apps');
+		var extMessage = document.getElementById('validation-ext'),
+			termMessage = document.getElementById('validation-term'),
+			dateMessage = document.getElementById('validation-date'),
+			appMessage = document.getElementById('validation-app'),
+			kwsMessage = document.getElementById('validation-kws'),
+			appsMessage = document.getElementById('validation-apps-id');
+		var isValidExt = true,
+			isValidTerm = true,
+			isValidApp = true,
+			isValidOldDate = true,
+			isValidNewDate = true,
+			isValidKws = true,
+			isValidAppsId = true;
+
+		isValidExt = validateInput(extInput, extMessage);
+		isValidTerm = validateInput(termInput, termMessage);
+		isValidApp = validateInput(appInput, appMessage);
+
+		if (!(func === 'getSearchAds')) {
+			isValidKws = validateInput(kwsInput, kwsMessage);
+		}
+		if (!(func === 'saveKeywords')) {
+			isValidAppsId = validateInput(appsInput, appsMessage);
+		}
+		if (!(
+			func === 'getKeywords'
+			|| func === 'getReviews'
+			|| func === 'getRatings'
+			|| func === 'getRankings'
+			|| func === 'getWhatsNew'
+		)) {
+			isValidOldDate = validateInput(dateOldInput, dateMessage);
+			isValidNewDate = validateInput(dateNewInput, dateMessage);
+		}
+
+		if (isValidExt && isValidTerm && isValidOldDate && isValidNewDate && isValidApp && isValidKws && isValidAppsId) {
+			getReport();
+		}
+	}
+
+	function getReport() {
+		showSpinner();
+		var usedParams = getUsedParams();
+		var func = usedParams[1];
+		usedParams = usedParams.slice(2);
+		var funcLabel = document.getElementById('select-function').selectedOptions[0].label;
+		var isNewSheet = document.getElementById('checkbox').checked;
+
+		var params = [func];
+		for (var i = 0; i < usedParams.length; i++) {
+			params.push(usedParams[i].value);
+		}
+
+		google.script.run._showReport(params, funcLabel, isNewSheet);
+	}
+
+	function generateFilters() {
+		var usedFilters = getUsedParams();
+		var extMessage = document.getElementById('validation-ext'),
+			termMessage = document.getElementById('validation-term'),
+			dateMessage = document.getElementById('validation-date'),
+			appMessage = document.getElementById('validation-app'),
+			kwsMessage = document.getElementById('validation-kws'),
+			appsMessage = document.getElementById('validation-apps-id'),
+			asoHint = document.getElementById('aso-hint');
+
+		hide(Object.values(usedFilters[0]));
+		hide([extMessage, termMessage, dateMessage, appMessage, kwsMessage, appsMessage, asoHint]);
+		clearForm(getFilters());
+		if (usedFilters[1] === '_getASOReport') {
+			usedFilters.push(asoHint);
+		}
+		show(usedFilters.slice(2));
+	}
+
+	function clearForm(fields) {
+		fields.extInput.value = '';
+		fields.termInput.value = '';
+		fields.appInput.value = '';
+		fields.pageInput.value = '';
+		fields.oldDateInput.value = '';
+		fields.newDateInput.value = '';
+		fields.phraseInput.value = '';
+	}
+
+	function getFilters() {
+		var filters = {};
+
+		filters.countrySelectAll = document.getElementById('select-country-all');
+		filters.countrySelectWW = document.getElementById('select-country-ww');
+		filters.countrySelectSAds = document.getElementById('select-country-sads');
+		filters.deviceSelect = document.getElementById('select-device');
+		filters.storeSelect = document.getElementById('select-store');
+		filters.deviceSelectTrending = document.getElementById('select-device-trending');
+		filters.channelSelectIos = document.getElementById('select-channel-ios');
+		filters.channelSelectAndroid = document.getElementById('select-channel-android');
+		filters.extInput = document.getElementById('input-ext');
+		filters.termInput = document.getElementById('input-term');
+		filters.appInput = document.getElementById('input-app');
+		filters.pageInput = document.getElementById('input-page');
+		filters.oldDateInput = document.getElementById('input-date-old');
+		filters.newDateInput = document.getElementById('input-date-new');
+		filters.phraseInput = document.getElementById('input-phrase');
+		filters.appsInput = document.getElementById('input-apps');
+		filters.langInput = document.getElementById('input-lang');
+
+		return filters;
+	}
+
+	function getUsedParams() {
+		var filters = getFilters();
+		var selectFunction = document.getElementById('select-function');
+		var value = selectFunction.selectedOptions[0].value;
+		var result = [];
+		filters.deviceSelect.options[2].disabled = false;
+
+		switch (value) {
+			case 'getSuggest':
+				result = [
+					filters,
+					value,
+					filters.termInput,
+					filters.countrySelectAll,
+					filters.deviceSelect
+				];
+				break;
+			case 'getSearch':
+				result = [
+					filters,
+					value,
+					filters.termInput,
+					filters.countrySelectAll,
+					filters.deviceSelect
+				];
+				break;
+			case 'getTrending':
+				filters.deviceSelect.options[2].disabled = true;
+				result = [
+					filters,
+					value,
+					filters.countrySelectAll,
+					filters.deviceSelectTrending
+				];
+				break;
+			case 'getSearchAds':
+				result = [
+					filters,
+					value,
+					filters.appInput,
+					filters.countrySelectSAds,
+					filters.phraseInput
+				];
+				break;
+			case 'getKeywords':
+				result = [
+					filters,
+					value,
+					filters.extInput,
+					filters.countrySelectAll,
+					filters.deviceSelect,
+					filters.newDateInput
+				];
+				break;
+			case 'getKeywordsCompare':
+				result = [
+					filters,
+					value,
+					filters.extInput,
+					filters.oldDateInput,
+					filters.newDateInput,
+					filters.countrySelectAll,
+					filters.deviceSelect
+				];
+				break;
+			case 'saveKeywords':
+				result = [
+					filters,
+					value,
+					filters.countrySelectAll,
+					filters.deviceSelect,
+					filters.phraseInput,
+					filters.appsInput
+				];
+				break;
+			case 'getRankings':
+				result = [
+					filters,
+					value,
+					filters.extInput,
+					filters.pageInput,
+					filters.newDateInput
+				];
+				break;
+			case 'getWhatsNew':
+				result = [
+					filters,
+					value,
+					filters.extInput,
+					filters.pageInput,
+					filters.newDateInput,
+					filters.storeSelect,
+					filters.langInput
+				];
+				break;
+			case 'getReviews':
+				result = [
+					filters,
+					value,
+					filters.extInput,
+					filters.pageInput,
+					filters.newDateInput,
+					filters.storeSelect,
+					filters.langInput
+				];
+				break;
+			case 'getReviewsSummary':
+				result = [
+					filters,
+					value,
+					filters.extInput,
+					filters.oldDateInput,
+					filters.newDateInput,
+					filters.storeSelect,
+					filters.langInput
+				];
+				break;
+			case 'getRatings':
+				result = [filters, value, filters.storeSelect, filters.extInput, filters.newDateInput];
+				break;
+			case 'getRatingsSummary':
+				result = [filters, value, filters.storeSelect, filters.extInput, filters.newDateInput];
+				break;
+			case 'getCollections':
+				result = [filters, value];
+				break;
+			case 'getAppsFromCollection':
+				result = [filters, value, filters.appsInput];
+				break;
+			case '_getASOReport':
+				if (filters.channelSelectAndroid.style.display === 'none') {
+					result = [
+						filters,
+						value,
+						filters.extInput,
+						filters.countrySelectWW,
+						filters.storeSelect,
+						filters.oldDateInput,
+						filters.newDateInput,
+						filters.channelSelectIos
+					];
+					break;
+				} else {
+					result = [
+						filters,
+						value,
+						filters.extInput,
+						filters.countrySelectWW,
+						filters.storeSelect,
+						filters.oldDateInput,
+						filters.newDateInput,
+						filters.channelSelectAndroid
+					];
+					break;
+				}
+		}
+
+		return result;
+	}
+
+	function show(elements) {
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].style.display = 'block';
+		}
+	}
+
+	function hide(elements) {
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].style.display = 'none';
+		}
+	}
+
+	function toggleMenu(event) {
+		var menu = document.querySelector('.menu');
+		var icon;
+
+		if (event.target.classList.contains('menu-icon')) {
+			icon = event.target;
+		} else {
+			icon = event.target.parentNode;
+		}
+
+		if (icon.classList.contains('menu-closed')) {
+			icon.classList.remove('menu-closed');
+			icon.classList.add('menu-opened');
+		} else {
+			icon.classList.remove('menu-opened');
+			icon.classList.add('menu-closed');
+		}
+
+		if (menu.classList.contains('closed')) {
+			menu.classList.remove('closed');
+			menu.classList.add('opened');
+		} else {
+			menu.classList.remove('opened');
+			menu.classList.add('closed');
+		}
+	}
+</script>
